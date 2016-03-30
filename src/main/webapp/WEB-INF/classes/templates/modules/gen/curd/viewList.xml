@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>viewList</name>
+	<filePath>src/main/webapp/WEB-INF/views/${lastPackageName}/${moduleName}/${subModuleName}</filePath>
+	<fileName>${className}List.jsp</fileName>
+	<content><![CDATA[
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ include file="/WEB-INF/views/include/taglib.jsp"%>
+<html>
+<head>
+	<title>${functionNameSimple}${r"${fns:getLang('common.management', null)}"}</title>
+	<meta name="decorator" content="default"/>	
+	
+	 <!-- CSS and JS for table fixed header -->
+	<link rel="stylesheet" href="${r"${ctxStatic}"}/bootstrap/table-fixed-header-master/table-fixed-header.min.css">
+	<script src="${r"${ctxStatic}"}/bootstrap/table-fixed-header-master/table-fixed-header.min.js"></script>
+	<script src="${r"${ctxStatic}"}/common/gridify.min.js"></script>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+				<#list table.columnList as c>
+					<#if c.isQuery?? && c.isQuery == "1" && c.showType == "autocomplete">
+			$( "#${c.javaFieldId}" ).autocomplete({
+		        minLength: 1,
+		        delay: 500,
+		        //define callback to format results
+		        source: function (request, response) {
+		            $.getJSON("${r"${ctx}"}/${urlPrefix}/get${c.simpleJavaField?cap_first}List", request, function(result) {
+		                response($.map(result, function(item) {
+		                    return {
+		                        // following property gets displayed in drop down
+		                        label: item.${c.javaFieldId},
+		                        // following property gets entered in the textbox
+		                        value: item.${c.javaFieldId}
+		                    }
+		                }));
+		            });
+		        },
+		 
+		        //define select handler
+		        select : function(event, ui) {
+		            if (ui.item) {
+		                event.preventDefault();
+		                $("#${c.javaFieldId}").val(ui.item.value);
+		                $("#${c.javaFieldId}").blur();
+		                return false;
+		            }
+		        }
+		    });
+		    		</#if>
+				</#list>
+		 		<#if ioArtifact?? && ioArtifact == "orangesignal-csv">
+			$("#btnCsvExport").click(function(){
+				top.$.jBox.confirm("确认要导出数据文件吗？如果数据过大，可能需要一些时间。","系统提示",function(v,h,f){
+					if(v=="ok"){
+						$("#exportCsvForm").submit();
+					}
+				},{buttonsFocus:1});
+				top.$('.jbox-body .jbox-icon').css('top','55px');
+			});
+			$("#btnCsvImport").click(function(){
+				$.jBox($("#importCsvBox").html(), {title:"导入数据", buttons:{"关闭":true}, 
+					bottomText:"导入文件不能超过5M，仅允许导入“csv”格式文件！"});
+			});
+				</#if>
+				
+		 		<#if ioArtifact?? && ioArtifact == "poi">
+			$("#btnExcelExport").click(function(){
+				top.$.jBox.confirm("确认要导出数据文件吗？如果数据过大，可能需要一些时间。","系统提示",function(v,h,f){
+					if(v=="ok"){
+						$("#exportExcelForm").submit();
+					}
+				},{buttonsFocus:1});
+				top.$('.jbox-body .jbox-icon').css('top','55px');
+			});
+			$("#btnExcelImport").click(function(){
+				$.jBox($("#importExcelBox").html(), {title:"导入数据", buttons:{"关闭":true}, 
+					bottomText:"导入文件不能超过5M，仅允许导入“xls”或“xlsx”格式文件！"});
+			});
+				</#if>
+				
+				<#if showRowCheckBox??>
+			// 删除选中行数据
+			$("#btnDeleteChecked").click(function(){
+				$.batPro("${r"${ctx}"}/${urlPrefix}/deleteChecked", "${r"${fns:getLang('common.delete', null)}"}");
+			});
+				</#if>
+
+				<#if showRowCopyFunction??>
+			// 复制选中行数据
+			$("#btnCopyChecked").click(function(){
+				$.batPro("${r"${ctx}"}/${urlPrefix}/copyChecked", "${r"${fns:getLang('common.copy', null)}"}");
+			});
+				</#if>
+				
+			// 双击记录进行编辑
+			$("#contentTable tr").on("dblclick", function() {
+			    location.href="${r"${ctx}"}/${urlPrefix}/form?id="+this.id;
+			});
+			
+			// make the header fixed on scroll
+			$(".table-fixed-header").fixedHeader();
+		});
+		function page(n,s){
+			$("#pageNo").val(n);
+			$("#pageSize").val(s);
+			$("#searchForm").submit();
+        	return false;
+        }
+        	    
+	    // 重置按钮
+	    function searchReset(formId){
+	    	// 重置所有输入框
+	    	var inputDom = $("#" + formId).find(":input[type='text']");
+	    	if(inputDom) inputDom.val("");
+	    	
+	    	// 重置下拉框
+	    	//$("#type").val("");
+	    	
+	    	// 刷新表单
+			$("#" + formId).submit();	    	
+	    }
+	</script>
+</head>
+<body>
+		<#if ioArtifact?? && ioArtifact == "orangesignal-csv">
+	<div id="importCsvBox" class="hide">
+		<form id="importCsvForm" action="${r"${ctx}"}/${urlPrefix}/import/csv" method="post" enctype="multipart/form-data"
+			class="form-search" style="padding-left:20px;text-align:center;" onsubmit="loading('正在导入，请稍等...');"><br/>
+			<input id="uploadCsvFile" name="file" type="file" style="width:330px"/><br/><br/>　　
+			<input id="btnImportCsvSubmit" class="btn btn-primary" type="submit" value="   导    入   "/>
+			<a href="${r"${ctx}"}/${urlPrefix}/import/csv/template">下载模板</a>
+		</form>
+		<form id="exportCsvForm" action="${r"${ctx}"}/${urlPrefix}/export/csv" method="post" enctype="multipart/form-data">
+		</form>
+	</div>
+		</#if>
+		<#if ioArtifact?? && ioArtifact == "poi">
+	<div id="importExcelBox" class="hide">
+		<form id="importExcelForm" action="${r"${ctx}"}/${urlPrefix}/import/excel" method="post" enctype="multipart/form-data"
+			class="form-search" style="padding-left:20px;text-align:center;" onsubmit="loading('正在导入，请稍等...');"><br/>
+			<input id="uploadExcelFile" name="file" type="file" style="width:330px"/><br/><br/>　　
+			<input id="btnImportExcelSubmit" class="btn btn-primary" type="submit" value="   导    入   "/>
+			<a href="${r"${ctx}"}/${urlPrefix}/import/excel/template">下载模板</a>
+		</form>
+		<form id="exportExcelForm" action="${r"${ctx}"}/${urlPrefix}/export/excel" method="post" enctype="multipart/form-data">
+		</form>
+	</div>
+		</#if>
+	<ul id="mynav" class="nav nav-tabs">
+		<li class="active"><a href="${r"${ctx}"}/${urlPrefix}/">${functionNameSimple}${r"${fns:getLang('common.list', null)}"}</a></li>
+		<shiro:hasPermission name="${permissionPrefix}:edit"><li><a href="${r"${ctx}"}/${urlPrefix}/form">${functionNameSimple}${r"${fns:getLang('common.add', null)}"}</a></li></shiro:hasPermission>
+	</ul>
+	<form:form id="searchForm" modelAttribute="${className}" action="${r"${ctx}"}/${urlPrefix}/" method="post" class="breadcrumb form-search">
+		<input id="pageNo" name="pageNo" type="hidden" value="${r"${page.pageNo}"}"/>
+		<input id="pageSize" name="pageSize" type="hidden" value="${r"${page.pageSize}"}"/>
+		<sys:tableSort id="orderBy" name="orderBy" value="${r"${page.orderBy}"}" callback="page();"/>
+		<ul class="ul-form">
+		<#list table.columnList as c>
+			<#if c.isQuery?? && c.isQuery == "1">
+			<li><label>${c.comments}：</label>
+			<#if c.showType == "input" || c.showType == "textarea" || c.showType == "autocomplete">
+				<form:input id="${c.javaFieldId}" path="${c.javaFieldId}" htmlEscape="false"<#if c.dataLength != "0"> maxlength="${c.dataLength}"</#if> class="input-medium"<#if c.showType == "autocomplete"> onFocus="inputFocus(this)" onBlur="inputBlur(this)"</#if>/>
+			<#elseif c.showType == "select">
+				<form:select path="${c.javaFieldId}" class="input-medium">
+					<form:option value="" label="${"$"}{fns:getLang('common.null', null) }"/>
+					<form:options items="${"$"}{fns:getDictList('${c.dictType}')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+				</form:select>
+			<#elseif c.showType == "checkbox">
+				<form:checkboxes path="${c.javaFieldId}" items="${"$"}{fns:getDictList('${c.dictType}')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+			<#elseif c.showType == "radiobox">
+				<form:radiobuttons path="${c.javaFieldId}" items="${"$"}{fns:getDictList('${c.dictType}')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
+			<#elseif c.showType == "dateselect" && c.queryType == "between">
+				<input name="begin${c.simpleJavaField?cap_first}" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${"$"}{${className}.begin${c.simpleJavaField?cap_first}}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/> - 
+				<input name="end${c.simpleJavaField?cap_first}" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${"$"}{${className}.end${c.simpleJavaField?cap_first}}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+			<#elseif c.showType == "dateselect">
+				<input name="${c.javaFieldId}" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${"$"}{${className}.${c.javaFieldId}}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
+			<#elseif c.showType == "userselect">
+				<sys:treeselect id="${c.simpleJavaField}" name="${c.javaFieldId}" value="${"$"}{${className}.${c.javaFieldId}}" labelName="${c.javaFieldName}" labelValue="${"$"}{${className}.${c.javaFieldName}}"
+					title="${r"${fns:getLang('common.user', null)}"}" url="/sys/office/treeData?type=3" cssClass="input-small" allowClear="true" notAllowSelectParent="true"/>
+			<#elseif c.showType == "officeselect">
+				<sys:treeselect id="${c.simpleJavaField}" name="${c.javaFieldId}" value="${"$"}{${className}.${c.javaFieldId}}" labelName="${c.javaFieldName}" labelValue="${"$"}{${className}.${c.javaFieldName}}"
+					title="${r"${fns:getLang('common.dept', null)}"}" url="/sys/office/treeData?type=2" cssClass="input-small" allowClear="true" notAllowSelectParent="true"/>
+			<#elseif c.showType == "areaselect">
+				<sys:treeselect id="${c.simpleJavaField}" name="${c.javaFieldId}" value="${"$"}{${className}.${c.javaFieldId}}" labelName="${c.javaFieldName}" labelValue="${"$"}{${className}.${c.javaFieldName}}"
+					title="${r"${fns:getLang('common.area', null)}"}" url="/sys/area/treeData" cssClass="input-small" allowClear="true" notAllowSelectParent="true"/>
+			</#if>
+			</li>
+			</#if>
+		</#list>
+			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="${r"${fns:getLang('common.query', null)}"}"/></li>
+			<li class="btns"><input id="btnSearchReset" class="btn btn-primary" type="reset" value="${r"${fns:getLang('common.reset', null)}"}" onclick="searchReset('searchForm');"/></li>
+				<#if showRowCheckBox??>
+			<li class="btns"><input id="btnDeleteChecked" class="btn btn-primary" type="button" value="${r"${fns:getLang('common.delete', null)}"}" disabled="true" /></li>
+				</#if>
+				<#if showRowCopyFunction??>
+			<shiro:hasPermission name="${permissionPrefix}:dba"><li class="btns" style="padding-left:30px;"><input id="btnCopyChecked" class="btn btn-primary" type="button" value="${r"${fns:getLang('common.copy', null)}"}" disabled="true" /></li></shiro:hasPermission>
+				</#if>
+				<#if showPhysicalDeleteFunction??>
+			<shiro:hasPermission name="${permissionPrefix}:dba"><li class="btns"><input id="btnTruncateTable" class="btn btn-warning" type="button" value="物理清空" onclick="truncateTable('${r"${ctx}"}/${urlPrefix}/truncateTable');"/></li></shiro:hasPermission>
+				</#if>
+				<#if ioArtifact?? && ioArtifact == "orangesignal-csv">
+			<% // CSV管理： 模版下载、数据导入、导入数据校验、数据导出 %>
+			<li><label></label></li>
+			<shiro:hasPermission name="${permissionPrefix}:io"><li class="btns"><input id="btnCsvExport" class="btn btn-primary" type="button" value="CSV数据导出"/></li></shiro:hasPermission>
+			<shiro:hasPermission name="${permissionPrefix}:io"><li class="btns"><input id="btnCsvImport" class="btn btn-primary" type="button" value="CSV数据导入"/></li></shiro:hasPermission>
+				</#if>
+				<#if ioArtifact?? && ioArtifact == "poi">
+			<% // Excel导入导出 %>
+			<li><label></label></li>
+			<shiro:hasPermission name="${permissionPrefix}:io"><li class="btns"><input id="btnExcelExport" class="btn btn-primary" type="button" value="Excel数据导出"/></li></shiro:hasPermission>
+			<shiro:hasPermission name="${permissionPrefix}:io"><li class="btns"><input id="btnExcelImport" class="btn btn-primary" type="button" value="Excel数据导入"/></li></shiro:hasPermission>
+				</#if>
+			<li class="clearfix"></li>
+		</ul>
+	</form:form>
+	<sys:message content="${r"${message}"}"/>
+	<form:form id="gridForm" modelAttribute="${className}" action="${r"${ctx}"}/${urlPrefix}/deleteChecked" method="post">
+		<span id="cbRowDataIdsBox">
+			<input name="cbRowDataIds" type="hidden" value=""/>
+		</span>
+		<table id="contentTable" class="table table-striped table-bordered table-condensed table-hover table-fixed-header">
+			<thead class="header">
+				<tr>
+						<#if showRowCheckBox??>
+					<th class="row-checkbox" title="${r"${fns:getLang('common.checkall', null)}"}"><input type="checkbox" name="checkall" id="checkall" class="checkbox" /><label for="checkall"><span></span></label></th>
+						</#if>
+						<#if showRowNo??>
+					<th class="row-number">No.</th>
+						</#if>
+					<th style="display:none;">ID</th>
+					<#list table.columnList as c>
+						<#if c.isList?? && c.isList == "1">
+					<th<#if c.orderType??> class="sort-column ${c.name}" title="${"$"}{fns:getLang('common.sortable', null)}"</#if>>${c.comments}</th>
+						</#if>
+					</#list>
+					<shiro:hasPermission name="${permissionPrefix}:edit"><th>
+						${r"${fns:getLang('common.operate', null)}"}
+							<#if showPhysicalDeleteFunction??>
+						<shiro:hasPermission name="${permissionPrefix}:dba">
+							[<form:checkbox id="physicalDelete" path="physicalDelete" label="物理删除" title="默认逻辑删除，勾选后进行物理删除" />]
+						</shiro:hasPermission>
+							</#if>
+					</th></shiro:hasPermission>
+				</tr>
+			</thead>
+			<tbody>
+			<c:forEach items="${r"${page.list}"}" var="${className}" varStatus="vs">
+				<tr id="${"${"+className+".id}"}">
+						<#if showRowCheckBox??>
+					<td class="row-checkbox"><input type="checkbox" name="cbRowData" id="cb_${"${"+className+".id}"}" class="checkbox" /><label for="cb_${"${"+className+".id}"}"><span></span></label></td></td>
+						</#if>
+						<#if showRowNo??>
+					<td class="row-number">
+						${r"${vs.index + 1}"}
+					</td>
+						</#if>
+					<td class="row-id" style="display:none;">${"${"+className+".id}"}</td>
+					<#assign firstListField = true>
+					<#list table.columnList as c>
+						<#if c.isList?? && c.isList == "1">
+					<td><#if firstListField><a href="${r"${ctx}"}/${urlPrefix}/form?id=${"${"+className+".id}"}"></#if>
+					<#if c.simpleJavaType == "Date">
+						<fmt:formatDate value="${"$"}{${className}.${c.javaFieldId}}" pattern="yyyy-MM-dd HH:mm:ss"/>
+					<#elseif c.showType == "select" || c.showType == "checkbox" || c.showType == "radiobox">
+						${"$"}{fns:getDictLabel(${className}.${c.javaFieldId}, '${c.dictType}', '')}
+					<#elseif c.showType == "userselect" || c.showType == "officeselect" || c.showType == "areaselect">
+						${"$"}{${className}.${c.javaFieldName}}
+					<#else>
+						${"$"}{${className}.${c.javaFieldId}}
+					</#if>
+					<#if firstListField></a></#if></td>
+							<#assign firstListField = false>
+						</#if>
+					</#list>
+					<shiro:hasPermission name="${permissionPrefix}:edit"><td class="row-operate">
+	    				<a href="${r"${ctx}"}/${urlPrefix}/form?id=${"${"+className+".id}"}">${r"${fns:getLang('common.edit', null)}"}</a>
+						<a href="javascript:void(0)" onclick="rowDelete('${r"${ctx}"}/${urlPrefix}/delete?id=${"${"+className+".id}"}');">${r"${fns:getLang('common.delete', null)}"}</a>
+							<#if showRowCheckBox??>
+						<shiro:hasPermission name="${permissionPrefix}:dba">&nbsp;|&nbsp;<a href="${r"${ctx}"}/${urlPrefix}/copy?id=${"${"+className+".id}"}" onclick="top.$.jBox.tip.mess=false;return this.href">${r"${fns:getLang('common.copy', null)}"}</a></shiro:hasPermission>
+							</#if>
+					</td></shiro:hasPermission>
+				</tr>
+			</c:forEach>
+			</tbody>
+		</table>
+	</form:form>
+	<div class="pagination">${r"${page}"}</div>
+</body>
+</html>]]>
+	</content>
+</template>
