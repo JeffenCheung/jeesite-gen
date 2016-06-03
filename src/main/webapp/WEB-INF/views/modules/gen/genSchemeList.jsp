@@ -8,6 +8,7 @@
 	 <!-- CSS and JS for table fixed header -->
 	<link rel="stylesheet" href="${ctxStatic}/bootstrap/table-fixed-header-master/table-fixed-header.min.css">
 	<script src="${ctxStatic}/bootstrap/table-fixed-header-master/table-fixed-header.min.js"></script>
+	<script src="${ctxStatic}/bootstrap/table-fixed-header-master/bottom-sticker.min.js"></script>
 	
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -15,6 +16,11 @@
 			// make the header fixed on scroll
 			$(".table-fixed-header").fixedHeader();
 			
+			// 双击记录进行编辑
+			$("#contentTable tbody tr").on("dblclick", function() {
+			    location.href="${ctx}/gen/genScheme/form?id="+this.id;
+			});
+			$("#bottom-sticker").bottomSticker();
 		});
 		function page(n,s){
 			$("#pageNo").val(n);
@@ -65,6 +71,6 @@
 		</c:forEach>
 		</tbody>
 	</table>
-	<div class="pagination">${page}</div>
+	<div class="pagination" id="bottom-sticker">${page}</div>
 </body>
 </html>

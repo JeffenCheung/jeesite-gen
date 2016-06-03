@@ -8,39 +8,32 @@ import com.thinkgem.jeesite.modules.sys.entity.Office;
 import com.thinkgem.jeesite.modules.sys.entity.Area;
 import org.hibernate.validator.constraints.Length;
 import java.util.Date;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import com.thinkgem.jeesite.common.persistence.DataEntity;
-import com.orangesignal.csv.annotation.*;
+import com.thinkgem.jeesite.common.utils.excel.annotation.*;
 
 /**
  * 单表生成Entity
  * @author Jeffen@pactera
- * @version 2015-10-10
+ * @version 2016-05-27
  */
-@CsvEntity(header = true)
-@XmlRootElement
 public class TestData extends DataEntity<TestData> {
 	
 	private static final long serialVersionUID = 1L;
-	@CsvColumn(access=CsvColumnAccessType.READ_WRITE, name = "归属用户")
 	private User user;		// 归属用户
-	@CsvColumn(access=CsvColumnAccessType.READ_WRITE, name = "归属部门")
 	private Office office;		// 归属部门
-	@CsvColumn(access=CsvColumnAccessType.READ, name = "归属区域")
 	private Area area;		// 归属区域
-	@CsvColumn(access=CsvColumnAccessType.READ_WRITE, name = "名称")
 	private String name;		// 名称
-	@CsvColumn(access=CsvColumnAccessType.READ_WRITE, name = "性别")
 	private String sex;		// 性别
-	@CsvColumn(access=CsvColumnAccessType.READ_WRITE, name = "加入日期")
 	private Date inDate;		// 加入日期
+	private String tags;		// 标签
+	private Long age;		// 年龄
 	private Date beginInDate;		// 开始 加入日期
 	private Date endInDate;		// 结束 加入日期
-
+	private Long beginAge;		// 开始 年龄
+	private Long endAge;		// 结束 年龄
+	
 	public TestData() {
 		super();
 	}
@@ -49,6 +42,7 @@ public class TestData extends DataEntity<TestData> {
 		super(id);
 	}
 
+	@ExcelField(type = 0, sort = 2, title = "归属用户")
 	public User getUser() {
 		return user;
 	}
@@ -57,6 +51,7 @@ public class TestData extends DataEntity<TestData> {
 		this.user = user;
 	}
 	
+	@ExcelField(type = 1, sort = 3, title = "归属部门")
 	public Office getOffice() {
 		return office;
 	}
@@ -65,6 +60,7 @@ public class TestData extends DataEntity<TestData> {
 		this.office = office;
 	}
 	
+	@ExcelField(type = 0, sort = 4, title = "归属区域")
 	public Area getArea() {
 		return area;
 	}
@@ -74,6 +70,7 @@ public class TestData extends DataEntity<TestData> {
 	}
 	
 	@Length(min=0, max=100, message="名称长度必须介于 0 和 100 之间")
+	@ExcelField(type = 2, sort = 5, title = "名称")
 	public String getName() {
 		return name;
 	}
@@ -83,6 +80,7 @@ public class TestData extends DataEntity<TestData> {
 	}
 	
 	@Length(min=0, max=1, message="性别长度必须介于 0 和 1 之间")
+	@ExcelField(type = 0, sort = 6, title = "性别")
 	public String getSex() {
 		return sex;
 	}
@@ -92,12 +90,30 @@ public class TestData extends DataEntity<TestData> {
 	}
 	
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	@ExcelField(type = 1, sort = 7, title = "加入日期")
 	public Date getInDate() {
 		return inDate;
 	}
 
 	public void setInDate(Date inDate) {
 		this.inDate = inDate;
+	}
+	
+	public String getTags() {
+		return tags;
+	}
+
+	public void setTags(String tags) {
+		this.tags = tags;
+	}
+	
+	@ExcelField(type = 0, sort = 150, title = "年龄")
+	public Long getAge() {
+		return age;
+	}
+
+	public void setAge(Long age) {
+		this.age = age;
 	}
 	
 	public Date getBeginInDate() {
@@ -115,10 +131,21 @@ public class TestData extends DataEntity<TestData> {
 	public void setEndInDate(Date endInDate) {
 		this.endInDate = endInDate;
 	}
+		
+	public Long getBeginAge() {
+		return beginAge;
+	}
+
+	public void setBeginAge(Long beginAge) {
+		this.beginAge = beginAge;
+	}
 	
-	@Override
-	public String toString(){
-		return this.id + "#" + this.name + "#" ;
+	public Long getEndAge() {
+		return endAge;
+	}
+
+	public void setEndAge(Long endAge) {
+		this.endAge = endAge;
 	}
 		
 }

@@ -16,6 +16,7 @@
 	 <!-- CSS and JS for bootstrap-tagsinput -->
 	<link rel="stylesheet" href="${r"${ctxStatic}"}/bootstrap/bootstrap-tagsinput/bootstrap-tagsinput.css">
 	<script src="${r"${ctxStatic}"}/bootstrap/bootstrap-tagsinput/bootstrap-tagsinput.min.js"></script>
+	<script src="${r"${ctxStatic}"}/bootstrap/table-fixed-header-master/bottom-sticker.min.js"></script>
 		</#if>
 	</#list>
 	<script type="text/javascript">
@@ -36,6 +37,7 @@
 					}
 				}
 			});
+			$("#bottom-sticker").bottomSticker();
 		});
 	<#list table.childList as c>
 		function addRow(list, idx, tpl, row){
@@ -210,7 +212,7 @@
 				</div>
 			</div>
 		</#list>
-		<div class="form-actions">
+		<div class="form-actions" id="bottom-sticker">
 			<shiro:hasPermission name="${permissionPrefix}:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
 			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
 		</div>

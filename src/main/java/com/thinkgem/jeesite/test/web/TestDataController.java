@@ -30,16 +30,16 @@ import com.thinkgem.jeesite.test.service.TestDataService;
 
 import javax.validation.ConstraintViolationException;
 import org.springframework.web.multipart.MultipartFile;
-import com.orangesignal.csv.CsvConfig;
-import com.orangesignal.csv.manager.CsvEntityManager;
-import com.orangesignal.csv.manager.CsvSaver;
+
 import com.thinkgem.jeesite.common.beanvalidator.BeanValidators;
 import com.thinkgem.jeesite.common.utils.DateUtils;
 import com.thinkgem.jeesite.common.utils.Encodes;
+import com.thinkgem.jeesite.common.utils.excel.ExportExcel;
+import com.thinkgem.jeesite.common.utils.excel.ImportExcel;
 /**
  * 单表生成Controller
  * @author Jeffen@pactera
- * @version 2015-10-10
+ * @version 2016-05-27
  */
 @Controller
 @RequestMapping(value = "${adminPath}/test/testData")
@@ -151,8 +151,9 @@ public class TestDataController extends BaseController {
 		return URL_ADMIN_REPAGE;
 	}
 	
+	
 	/**
-	 * 导出CSV数据
+	 * 导出Excel数据
 	 * @param testData
 	 * @param request
 	 * @param response
@@ -160,22 +161,14 @@ public class TestDataController extends BaseController {
 	 * @return
 	 */
 	@RequiresPermissions(PERMISSION_IO)
-	@RequestMapping(value = "export/csv", method = RequestMethod.POST)
-	public String exportCsvFile(TestData testData, HttpServletRequest request,
+	@RequestMapping(value = "export/excel", method = RequestMethod.POST)
+	public String exportExcelFile(TestData testData, HttpServletRequest request,
 			HttpServletResponse response, RedirectAttributes redirectAttributes) {
 		try {
-			String fileName = "【单表】" + DateUtils.getDateTimeTight() + ".csv";
+			String fileName = "【单表】" + DateUtils.getDateTimeTight() + ".xlsx";
 			List<TestData> lst = testDataService.findList(testData);
-			CsvEntityManager cet = new CsvEntityManager(new CsvConfig(
-					CsvConfig.DEFAULT_SEPARATOR));
-			CsvSaver csvSaver = null;
-			response.reset();
-			response.setContentType("application/octet-stream; charset=utf-8");
-			response.setHeader("Content-Disposition", "attachment; filename="
-					+ Encodes.urlEncode(fileName));
-			csvSaver = cet.save(lst, TestData.class);
-			csvSaver.to(response.getOutputStream());
-			return null;
+			new ExportExcel("单表", TestData.class).setDataList(lst).write(response, fileName).dispose();
+    		return null;
 		} catch (Exception e) {
 			addMessage(redirectAttributes, "导出单表失败！失败信息：" + e.getMessage());
 		}
@@ -183,15 +176,15 @@ public class TestDataController extends BaseController {
 	}
 
 	/**
-	 * 导入CSV数据
+	 * 导入Excel数据
 	 * 
 	 * @param file
 	 * @param redirectAttributes
 	 * @return
 	 */
 	@RequiresPermissions(PERMISSION_IO)
-	@RequestMapping(value = "import/csv", method = RequestMethod.POST)
-	public String importCsvFile(MultipartFile file,
+	@RequestMapping(value = "import/excel", method = RequestMethod.POST)
+	public String importExcelFile(MultipartFile file,
 			RedirectAttributes redirectAttributes) throws Exception {
 		if (Global.isDemoMode()) {
 			addMessage(redirectAttributes, "演示模式，不允许操作！");
@@ -205,11 +198,11 @@ public class TestDataController extends BaseController {
 			if (StringUtils.isBlank(file.getOriginalFilename())) {
 				throw new RuntimeException("导入文档为空!");
 			} else if (!file.getOriginalFilename().toLowerCase()
-					.endsWith("csv")) {
+					.endsWith("xlsx")) {
 				throw new RuntimeException("文档格式不正确!");
 			} else {
-				List<TestData> list = new CsvEntityManager().load(
-						TestData.class).from(file.getInputStream());
+				ImportExcel ei = new ImportExcel(file, 1, 0);
+				List<TestData> list = ei.getDataList(TestData.class);
 				long i = 0;
 				for (TestData testData : list) {
 
@@ -219,7 +212,7 @@ public class TestDataController extends BaseController {
 						successNum++;
 						++i;
 					} catch (ConstraintViolationException ex) {
-						failureMsg.append("<br/>CSV数据第" + i + "行导入失败：");
+						failureMsg.append("<br/>Excel数据第" + i + "行导入失败：");
 						List<String> messageList = BeanValidators
 								.extractPropertyAndMessageAsList(ex, ": ");
 						for (String message : messageList) {
@@ -227,46 +220,41 @@ public class TestDataController extends BaseController {
 							failureNum++;
 						}
 					} catch (Exception ex) {
-						failureMsg.append("<br/>导入CSV数据失败：" + ex.getMessage());
+						failureMsg.append("<br/>导入Excel数据失败：" + ex.getMessage());
 					}
 				}
 				if (failureNum > 0) {
 					failureMsg.insert(0, "，失败 " + failureNum + " 条数据，导入信息如下：");
 				}
 				addMessage(redirectAttributes, "已成功导入 " + successNum
-						+ " 条CSV数据" + failureMsg);
+						+ " 条Excel数据" + failureMsg);
 			}
 		} catch (Exception e) {
-			addMessage(redirectAttributes, "导入CSV数据失败！失败信息：" + e.getMessage());
+			addMessage(redirectAttributes, "导入Excel数据失败！失败信息：" + e.getMessage());
 		}
 		return URL_ADMIN_REPAGE;
 	}
 
 	/**
-	 * 下载导入CSV数据的模板
+	 * 下载导入Excel数据的模板
 	 * 
 	 * @param response
 	 * @param redirectAttributes
 	 * @return
 	 */
 	@RequiresPermissions(PERMISSION_IO)
-	@RequestMapping(value = "import/csv/template")
-	public String importCsvFileTemplate(HttpServletResponse response,
+	@RequestMapping(value = "import/excel/template")
+	public String importExcelFileTemplate(HttpServletResponse response,
 			RedirectAttributes redirectAttributes) {
 		try {
-			String fileName = "【单表】数据导入模板.csv";
+			String fileName = "【单表】数据导入模板.xlsx";
 
 			List<TestData> list = new ArrayList();
 			TestData testData = new TestData();
 			//testData = testData.getSinglePoJoByDefaultValue();
 			list.add(testData);
 
-			CsvEntityManager cet = new CsvEntityManager();
-			response.reset();
-			response.setContentType("application/octet-stream; charset=utf-8");
-			response.setHeader("Content-Disposition", "attachment; filename="
-					+ Encodes.urlEncode(fileName));
-			cet.save(list, TestData.class).to(response.getOutputStream());
+			new ExportExcel("单表", TestData.class, 2).setDataList(list).write(response, fileName).dispose();
 			return null;
 
 		} catch (Exception e) {
@@ -274,5 +262,4 @@ public class TestDataController extends BaseController {
 		}
 		return URL_ADMIN_REPAGE;
 	}
-	
 }

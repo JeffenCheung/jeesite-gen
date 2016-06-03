@@ -5,10 +5,6 @@
 	<title>单表管理</title>
 	<meta name="decorator" content="default"/>
 	
-	 <!-- CSS and JS for bootstrap-tagsinput -->
-	<link rel="stylesheet" href="${ctxStatic}/bootstrap/bootstrap-tagsinput/bootstrap-tagsinput.css">
-	<script src="${ctxStatic}/bootstrap/bootstrap-tagsinput/bootstrap-tagsinput.min.js"></script>
-	
 	<script type="text/javascript">
 		$(document).ready(function() {
 			//$("#name").focus();
@@ -27,6 +23,7 @@
 					}
 				}
 			});
+			$("#bottom-sticker").bottomSticker();
 		});
 	</script>
 </head>
@@ -62,13 +59,7 @@
 		<div class="control-group">
 			<label class="control-label">名称：</label>
 			<div class="controls">
-				<form:input path="name" htmlEscape="false" maxlength="100" class="input-xlarge " />
-			</div>
-		</div>
-		<div class="control-group">
-			<label class="control-label">标签：</label>
-			<div class="controls">
-				<form:input path="tags" htmlEscape="false" maxlength="100" class="input-xlarge " data-role="tagsinput" />
+				<form:input path="name" htmlEscape="false" maxlength="100" class="input-xlarge "/>
 			</div>
 		</div>
 		<div class="control-group">
@@ -91,7 +82,19 @@
 				<form:textarea path="remarks" htmlEscape="false" rows="4" maxlength="255" class="input-xxlarge "/>
 			</div>
 		</div>
-		<div class="form-actions">
+		<div class="control-group">
+			<label class="control-label">标签：</label>
+			<div class="controls">
+				<form:input path="tags" htmlEscape="false" class="input-xlarge "/>
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label">年龄：</label>
+			<div class="controls">
+				<form:input path="age" htmlEscape="false" class="input-xlarge  digits"/>
+			</div>
+		</div>
+		<div class="form-actions" id="bottom-sticker">
 			<shiro:hasPermission name="test:testData:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
 			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
 		</div>

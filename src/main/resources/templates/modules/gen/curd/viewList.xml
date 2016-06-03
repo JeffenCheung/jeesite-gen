@@ -14,6 +14,7 @@
 	 <!-- CSS and JS for table fixed header -->
 	<link rel="stylesheet" href="${r"${ctxStatic}"}/bootstrap/table-fixed-header-master/table-fixed-header.min.css">
 	<script src="${r"${ctxStatic}"}/bootstrap/table-fixed-header-master/table-fixed-header.min.js"></script>
+	<script src="${r"${ctxStatic}"}/bootstrap/table-fixed-header-master/bottom-sticker.min.js"></script>
 	<script src="${r"${ctxStatic}"}/common/gridify.min.js"></script>
 	
 	<script type="text/javascript">
@@ -100,6 +101,7 @@
 			
 			// make the header fixed on scroll
 			$(".table-fixed-header").fixedHeader();
+			$("#bottom-sticker").bottomSticker();
 		});
 		function page(n,s){
 			$("#pageNo").val(n);
@@ -264,7 +266,7 @@
 						</#if>
 						<#if showRowNo??>
 					<td class="row-number">
-						${r"${vs.index + 1}"}
+						${r"${vs.index + 1 + (page.pageNo-1)*page.pageSize}"}
 					</td>
 						</#if>
 					<td class="row-id" style="display:none;">${"${"+className+".id}"}</td>
@@ -296,8 +298,8 @@
 			</c:forEach>
 			</tbody>
 		</table>
+		<div class="pagination" id="bottom-sticker">${r"${page}"}</div>
 	</form:form>
-	<div class="pagination">${r"${page}"}</div>
 </body>
 </html>]]>
 	</content>

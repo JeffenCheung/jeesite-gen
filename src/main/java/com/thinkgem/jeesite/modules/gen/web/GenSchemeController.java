@@ -140,6 +140,10 @@ public class GenSchemeController extends BaseController {
 	@RequestMapping(value = "save")
 	public String save(GenScheme genScheme, Model model,
 			RedirectAttributes redirectAttributes) {
+		if(Global.isDemoMode()){
+			addMessage4DemoMode(redirectAttributes);
+			return "redirect:" + adminPath + "/gen/genScheme/?repage";
+		}
 		if (!beanValidator(model, genScheme)) {
 			return form(genScheme, model);
 		}
@@ -154,6 +158,11 @@ public class GenSchemeController extends BaseController {
 	@RequestMapping(value = "delete")
 	public String delete(GenScheme genScheme,
 			RedirectAttributes redirectAttributes) {
+
+		if(Global.isDemoMode()){
+			addMessage4DemoMode(redirectAttributes);
+			return "redirect:" + adminPath + "/gen/genScheme/?repage";
+		}
 		genSchemeService.delete(genScheme);
 		addMessage(redirectAttributes, "删除生成方案成功");
 		return "redirect:" + adminPath + "/gen/genScheme/?repage";

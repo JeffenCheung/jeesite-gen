@@ -15,8 +15,9 @@
 		a.update_by AS "updateBy.id",
 		a.update_date AS "updateDate",
 		a.remarks AS "remarks",
-		a.tags AS "tags",
 		a.del_flag AS "delFlag",
+		a.tags AS "tags",
+		a.age AS "age",
 		u2.name AS "user.name",
 		o3.name AS "office.name",
 		a4.name AS "area.name"
@@ -64,6 +65,9 @@
 			<if test="beginInDate != null and endInDate != null and beginInDate != '' and endInDate != ''">
 				AND a.in_date BETWEEN #{beginInDate} AND #{endInDate}
 			</if>
+			<if test="beginAge != null and endAge != null and beginAge != '' and endAge != ''">
+				AND a.age BETWEEN #{beginAge} AND #{endAge}
+			</if>
 		</where>
 		<choose>
 			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
@@ -107,8 +111,9 @@
 			update_by,
 			update_date,
 			remarks,
+			del_flag,
 			tags,
-			del_flag
+			age
 		) VALUES (
 			#{id},
 			#{user.id},
@@ -122,8 +127,9 @@
 			#{updateBy.id},
 			#{updateDate},
 			#{remarks},
+			#{delFlag},
 			#{tags},
-			#{delFlag}
+			#{age}
 		)
 	</insert>
 	
@@ -138,7 +144,8 @@
 			update_by = #{updateBy.id},
 			update_date = #{updateDate},
 			remarks = #{remarks},
-			tags = #{tags}
+			tags = #{tags},
+			age = #{age}
 		WHERE id = #{id}
 	</update>
 	

@@ -174,7 +174,7 @@ public class TestDataMainController extends BaseController {
 	public String importExcelFile(MultipartFile file,
 			RedirectAttributes redirectAttributes) throws Exception {
 		if (Global.isDemoMode()) {
-			addMessage(redirectAttributes, "演示模式，不允许操作！");
+			addMessage4DemoMode(redirectAttributes);
 			return "redirect:" + Global.getAdminPath()
 					+ "/test/testDataMain/?repage";
 		}

@@ -8,6 +8,7 @@
 	 <!-- CSS and JS for table fixed header -->
 	<link rel="stylesheet" href="${ctxStatic}/bootstrap/table-fixed-header-master/table-fixed-header.min.css">
 	<script src="${ctxStatic}/bootstrap/table-fixed-header-master/table-fixed-header.min.js"></script>
+	<script src="${ctxStatic}/bootstrap/table-fixed-header-master/bottom-sticker.min.js"></script>
 	
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -18,6 +19,7 @@
 			$("#contentTable tbody tr").on("dblclick", function() {
 			    location.href="${ctx}/gen/genTable/form?id="+this.id;
 			});
+			$("#bottom-sticker").bottomSticker();
 		});
 		function page(n,s){
 			if(n) $("#pageNo").val(n);
@@ -69,6 +71,6 @@
 		</c:forEach>
 		</tbody>
 	</table>
-	<div class="pagination">${page}</div>
+	<div class="pagination" id="bottom-sticker">${page}</div>
 </body>
 </html>

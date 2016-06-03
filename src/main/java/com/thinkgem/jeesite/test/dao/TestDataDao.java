@@ -8,9 +8,9 @@ import com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao;
 import com.thinkgem.jeesite.test.entity.TestData;
 
 /**
- * 单表生成DAO接口
+ * 【数据源】单表生成DAO接口
  * @author Jeffen@pactera
- * @version 2015-10-10
+ * @version 2016-05-27
  */
 @MyBatisDao
 public interface TestDataDao extends CrudDao<TestData> {

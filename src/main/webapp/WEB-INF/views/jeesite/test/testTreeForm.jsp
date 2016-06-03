@@ -4,6 +4,9 @@
 <head>
 	<title>树结构管理</title>
 	<meta name="decorator" content="default"/>
+	
+	<script src="${ctxStatic}/bootstrap/table-fixed-header-master/bottom-sticker.min.js"></script>
+	
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$("#name").focus();
@@ -22,6 +25,8 @@
 					}
 				}
 			});
+			
+			$("#bottom-sticker").bottomSticker();
 		});
 	</script>
 </head>
@@ -60,7 +65,7 @@
 				<form:textarea path="remarks" htmlEscape="false" rows="4" maxlength="255" class="input-xxlarge "/>
 			</div>
 		</div>
-		<div class="form-actions">
+		<div class="form-actions" id="bottom-sticker">
 			<shiro:hasPermission name="test:testTree:edit"><input id="btnSubmit" class="btn btn-primary" type="submit" value="保 存"/>&nbsp;</shiro:hasPermission>
 			<input id="btnCancel" class="btn" type="button" value="返 回" onclick="history.go(-1)"/>
 		</div>

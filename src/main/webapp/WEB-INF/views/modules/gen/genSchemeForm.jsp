@@ -4,6 +4,9 @@
 <head>
 	<title>生成方案管理</title>
 	<meta name="decorator" content="default"/>
+	
+	<script src="${ctxStatic}/bootstrap/table-fixed-header-master/bottom-sticker.min.js"></script>
+	
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$("#name").focus();
@@ -22,6 +25,8 @@
 					}
 				}
 			});
+			
+			$("#bottom-sticker").bottomSticker();
 		});
 	</script>
 </head>
@@ -162,7 +167,7 @@
 				<form:checkbox path="replaceFile" label="是否替换现有文件" />
 			</div>
 		</div>
-		<div class="form-actions">
+		<div class="form-actions" id="bottom-sticker">
 			<shiro:hasPermission name="gen:genScheme:edit">
 				<input id="btnSubmit" class="btn btn-primary" type="submit" value="保存方案" onclick="$('#flag').val('0');"/>&nbsp;
 				<input id="btnSubmit" class="btn btn-danger" type="submit" value="保存并生成代码" onclick="$('#flag').val('1');"/>&nbsp;

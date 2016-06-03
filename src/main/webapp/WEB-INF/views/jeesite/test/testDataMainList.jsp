@@ -8,7 +8,9 @@
 	 <!-- CSS and JS for table fixed header -->
 	<link rel="stylesheet" href="${ctxStatic}/bootstrap/table-fixed-header-master/table-fixed-header.min.css">
 	<script src="${ctxStatic}/bootstrap/table-fixed-header-master/table-fixed-header.min.js"></script>
+	<script src="${ctxStatic}/bootstrap/table-fixed-header-master/bottom-sticker.min.js"></script>
 	<script src="${ctxStatic}/common/gridify.min.js"></script>
+	<script src="${ctxStatic}/jquery-plugin/colResizable-1.6.min.js"></script>
 	
 	<script type="text/javascript">
 		$(document).ready(function() {
@@ -43,6 +45,10 @@
 			
 			// make the header fixed on scroll
 			$(".table-fixed-header").fixedHeader();
+			$("#bottom-sticker").bottomSticker();
+			
+			// adding column resizing features
+			$("#contentTable").colResizable(reDefColResizable());
 		});
 		function page(n,s){
 			$("#pageNo").val(n);
@@ -114,14 +120,14 @@
 		<table id="contentTable" class="table table-striped table-bordered table-condensed table-hover table-fixed-header">
 			<thead class="header">
 				<tr>
-					<th class="row-checkbox" title="${fns:getLang('common.checkall', null)}"><input type="checkbox" name="checkall" id="checkall" class="checkbox" /><label for="checkall"><span></span></label></th>
-					<th class="row-number">No.</th>
+					<th style="width: 30px;" class="row-checkbox" title="${fns:getLang('common.checkall', null)}"><input type="checkbox" name="checkall" id="checkall" class="checkbox" /><label for="checkall"><span></span></label></th>
+					<th style="width: 30px;" class="row-number">No.</th>
 					<th style="display:none;">ID</th>
-					<th>归属用户</th>
-					<th>名称</th>
-					<th>更新时间</th>
-					<th>备注信息</th>
-					<shiro:hasPermission name="test:testDataMain:edit"><th>
+					<th style="width: 222px;">归属用户</th>
+					<th style="width: 222px;">名称</th>
+					<th style="width: 150px;" >更新时间</th>
+					<th style="width: 222px;">备注信息</th>
+					<shiro:hasPermission name="test:testDataMain:edit"><th style="width: 120px;">
 						${fns:getLang('common.operate', null)}
 						<div class="btn-group pull-right">
 							<a href="#" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
@@ -145,7 +151,7 @@
 				<tr id="${testDataMain.id}">
 					<td class="row-checkbox"><input type="checkbox" name="cbRowData" id="cb_${testDataMain.id}" class="checkbox" /><label for="cb_${testDataMain.id}"><span></span></label></td></td>
 					<td class="row-number">
-						${vs.index + 1}
+						${vs.index + 1 + (page.pageNo-1)*page.pageSize}
 					</td>
 					<td class="row-id" style="display:none;">${testDataMain.id}</td>
 					<td><a href="${ctx}/test/testDataMain/form?id=${testDataMain.id}">
@@ -169,7 +175,7 @@
 			</c:forEach>
 			</tbody>
 		</table>
+		<div class="pagination" id="bottom-sticker">${page}</div>
 	</form:form>
-	<div class="pagination">${page}</div>
 </body>
 </html>

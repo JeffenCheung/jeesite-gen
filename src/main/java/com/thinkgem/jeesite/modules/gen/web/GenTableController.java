@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.thinkgem.jeesite.common.config.Global;
 import com.thinkgem.jeesite.common.persistence.Page;
 import com.thinkgem.jeesite.common.utils.StringUtils;
 import com.thinkgem.jeesite.common.web.BaseController;
@@ -86,6 +87,10 @@ public class GenTableController extends BaseController {
 	@RequiresPermissions("gen:genTable:edit")
 	@RequestMapping(value = "save")
 	public String save(GenTable genTable, Model model, RedirectAttributes redirectAttributes) {
+		if(Global.isDemoMode()){
+			addMessage4DemoMode(redirectAttributes);
+			return "redirect:" + adminPath + "/gen/genTable/?repage";
+		}
 		if (!beanValidator(model, genTable)){
 			return form(genTable, model);
 		}
@@ -103,6 +108,10 @@ public class GenTableController extends BaseController {
 	@RequiresPermissions("gen:genTable:edit")
 	@RequestMapping(value = "delete")
 	public String delete(GenTable genTable, RedirectAttributes redirectAttributes) {
+		if(Global.isDemoMode()){
+			addMessage4DemoMode(redirectAttributes);
+			return "redirect:" + adminPath + "/gen/genTable/?repage";
+		}
 		genTableService.delete(genTable);
 		addMessage(redirectAttributes, "删除业务表成功");
 		return "redirect:" + adminPath + "/gen/genTable/?repage";

@@ -8,6 +8,7 @@
 	 <!-- CSS and JS for table fixed header -->
 	<link rel="stylesheet" href="${ctxStatic}/bootstrap/table-fixed-header-master/table-fixed-header.min.css">
 	<script src="${ctxStatic}/bootstrap/table-fixed-header-master/table-fixed-header.min.js"></script>
+	<script src="${ctxStatic}/bootstrap/table-fixed-header-master/bottom-sticker.min.js"></script>
 	<script src="${ctxStatic}/common/gridify.min.js"></script>
 	
 	<script type="text/javascript">
@@ -39,19 +40,19 @@
 		            }
 		        }
 		    });
-			$("#btnCsvExport").click(function(){
+				
+			$("#btnExcelExport").click(function(){
 				top.$.jBox.confirm("确认要导出数据文件吗？如果数据过大，可能需要一些时间。","系统提示",function(v,h,f){
 					if(v=="ok"){
-						$("#exportCsvForm").submit();
+						$("#exportExcelForm").submit();
 					}
 				},{buttonsFocus:1});
 				top.$('.jbox-body .jbox-icon').css('top','55px');
 			});
-			$("#btnCsvImport").click(function(){
-				$.jBox($("#importCsvBox").html(), {title:"导入数据", buttons:{"关闭":true}, 
-					bottomText:"导入文件不能超过5M，仅允许导入“csv”格式文件！"});
+			$("#btnExcelImport").click(function(){
+				$.jBox($("#importExcelBox").html(), {title:"导入数据", buttons:{"关闭":true}, 
+					bottomText:"导入文件不能超过5M，仅允许导入“xls”或“xlsx”格式文件！"});
 			});
-				
 				
 			// 删除选中行数据
 			$("#btnDeleteChecked").click(function(){
@@ -70,6 +71,7 @@
 			
 			// make the header fixed on scroll
 			$(".table-fixed-header").fixedHeader();
+			$("#bottom-sticker").bottomSticker();
 		});
 		function page(n,s){
 			$("#pageNo").val(n);
@@ -88,20 +90,19 @@
 	    	//$("#type").val("");
 	    	
 	    	// 刷新表单
-			$("#" + formId).submit();
+			$("#" + formId).submit();	    	
 	    }
-	    
 	</script>
 </head>
 <body>
-	<div id="importCsvBox" class="hide">
-		<form id="importCsvForm" action="${ctx}/test/testData/import/csv" method="post" enctype="multipart/form-data"
+	<div id="importExcelBox" class="hide">
+		<form id="importExcelForm" action="${ctx}/test/testData/import/excel" method="post" enctype="multipart/form-data"
 			class="form-search" style="padding-left:20px;text-align:center;" onsubmit="loading('正在导入，请稍等...');"><br/>
-			<input id="uploadCsvFile" name="file" type="file" style="width:330px"/><br/><br/>　　
-			<input id="btnImportCsvSubmit" class="btn btn-primary" type="submit" value="   导    入   "/>
-			<a href="${ctx}/test/testData/import/csv/template">下载模板</a>
+			<input id="uploadExcelFile" name="file" type="file" style="width:330px"/><br/><br/>　　
+			<input id="btnImportExcelSubmit" class="btn btn-primary" type="submit" value="   导    入   "/>
+			<a href="${ctx}/test/testData/import/excel/template">下载模板</a>
 		</form>
-		<form id="exportCsvForm" action="${ctx}/test/testData/export/csv" method="post" enctype="multipart/form-data">
+		<form id="exportExcelForm" action="${ctx}/test/testData/export/excel" method="post" enctype="multipart/form-data">
 		</form>
 	</div>
 	<ul id="mynav" class="nav nav-tabs">
@@ -132,18 +133,20 @@
 				<form:radiobuttons path="sex" items="${fns:getDictList('sex')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 			</li>
 			<li><label>加入日期：</label>
-				<input name="beginInDate" id="beginInDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-					value="<fmt:formatDate value="${testData.beginInDate}" pattern="yyyy-MM-dd"/>"
-					onfocus="gangDateStart('endInDate', true, 'yyyy-MM-dd');" onclick="gangDateStart('endInDate', true, 'yyyy-MM-dd');"/> - 
-				<input name="endInDate" id="endInDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
-					value="<fmt:formatDate value="${testData.endInDate}" pattern="yyyy-MM-dd"/>"
-					onfocus="gangDateEnd('beginInDate', true, 'yyyy-MM-dd');" onclick="gangDateEnd('beginInDate', true, 'yyyy-MM-dd');"/>
+				<input id="beginInDate" name="beginInDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${testData.beginInDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onfocus="gangDateStart('endInDate', true, 'yyyy-MM-dd HH:mm:ss');" onclick="gangDateStart('endInDate', true, 'yyyy-MM-dd HH:mm:ss');"/> - 
+				<input id="endInDate" name="endInDate" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					value="<fmt:formatDate value="${testData.endInDate}" pattern="yyyy-MM-dd HH:mm:ss"/>"
+					onfocus="gangDateEnd('beginInDate', true, 'yyyy-MM-dd HH:mm:ss');" onclick="gangDateEnd('beginInDate', true, 'yyyy-MM-dd HH:mm:ss');"/>
+			</li>
+			<li><label>年龄：</label>
+				<form:input id="age" path="age" htmlEscape="false" class="input-medium"/>
 			</li>
 			<li class="btns"><input id="btnSubmit" class="btn btn-primary" type="submit" value="${fns:getLang('common.query', null)}"/></li>
 			<li class="btns"><input id="btnSearchReset" class="btn btn-primary" type="reset" value="${fns:getLang('common.reset', null)}" onclick="searchReset('searchForm');"/></li>
 			<li class="btns"><input id="btnDeleteChecked" class="btn btn-primary" type="button" value="${fns:getLang('common.delete', null)}" disabled="true" /></li>
 			<shiro:hasPermission name="test:testData:dba"><li class="btns" style="padding-left:30px;"><input id="btnCopyChecked" class="btn btn-primary" type="button" value="${fns:getLang('common.copy', null)}" disabled="true" /></li></shiro:hasPermission>
-			
 			<li class="clearfix"></li>
 		</ul>
 	</form:form>
@@ -161,25 +164,26 @@
 					<th>归属用户</th>
 					<th>归属部门</th>
 					<th>归属区域</th>
-					<th class="sort-column a.name">名称</th>
+					<th class="sort-column name" title="${fns:getLang('common.sortable', null)}">名称</th>
 					<th>性别</th>
-					<th class="sort-column a.update_date">更新时间</th>
+					<th class="sort-column update_date" title="${fns:getLang('common.sortable', null)}">更新时间</th>
 					<th>备注信息</th>
+					<th>年龄</th>
 					<shiro:hasPermission name="test:testData:edit"><th>
 						${fns:getLang('common.operate', null)}
 						<shiro:hasAnyPermissions name="test:testData:dba,test:testData:io">
 						<div class="btn-group pull-right">
 							<a href="#" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								<% // 物理删除选项 %>
-								<shiro:hasPermission name="test:testData:dba">
-								<form:checkbox id="physicalDelete" path="physicalDelete" label="物理删除" title="默认逻辑删除，勾选后进行物理删除" />
-								<li class="btns"><input id="btnTruncateTable" class="btn btn-warning typeahead" type="button" value="物理清空" onclick="truncateTable('${ctx}/test/testData/truncateTable');"/></li></shiro:hasPermission>
-								<% // CSV管理： 模版下载、数据导入、导入数据校验、数据导出 %>
-								<li class="divider"></li>
-								<shiro:hasPermission name="test:testData:io">
-								<li class="btns"><input id="btnCsvExport" class="btn btn-primary typeahead" type="button" value="CSV数据导出"/></li>
-								<li class="btns"><input id="btnCsvImport" class="btn btn-primary typeahead" type="button" value="CSV数据导入"/></li></shiro:hasPermission>
+							<% // 物理删除选项 %>
+							<shiro:hasPermission name="test:testData:dba">
+							<form:checkbox id="physicalDelete" path="physicalDelete" label="物理删除" title="默认逻辑删除，勾选后进行物理删除" />
+							<li class="btns"><input id="btnTruncateTable" class="btn btn-warning typeahead" type="button" value="物理清空" onclick="truncateTable('${ctx}/test/testData/truncateTable');"/></li></shiro:hasPermission>
+							<% // Excel导入导出 %>
+							<li class="divider"></li>
+							<shiro:hasPermission name="test:testData:io">
+							<li class="btns"><input id="btnExcelExport" class="btn btn-primary typeahead" type="button" value="Excel数据导出"/></li>
+							<li class="btns"><input id="btnExcelImport" class="btn btn-primary typeahead" type="button" value="Excel数据导入"/></li></shiro:hasPermission>
 							</ul>
 						</div></shiro:hasAnyPermissions>
 					</th></shiro:hasPermission>
@@ -190,7 +194,7 @@
 				<tr id="${testData.id}">
 					<td class="row-checkbox"><input type="checkbox" name="cbRowData" id="cb_${testData.id}" class="checkbox" /><label for="cb_${testData.id}"><span></span></label></td></td>
 					<td class="row-number">
-						${vs.index + 1}
+						${vs.index + 1 + (page.pageNo-1)*page.pageSize}
 					</td>
 					<td class="row-id" style="display:none;">${testData.id}</td>
 					<td><a href="${ctx}/test/testData/form?id=${testData.id}">
@@ -214,6 +218,9 @@
 					<td>
 						${testData.remarks}
 					</td>
+					<td>
+						${testData.age}
+					</td>
 					<shiro:hasPermission name="test:testData:edit"><td class="row-operate">
 	    				<a href="${ctx}/test/testData/form?id=${testData.id}">${fns:getLang('common.edit', null)}</a>
 						<a href="javascript:void(0)" onclick="rowDelete('${ctx}/test/testData/delete?id=${testData.id}');">${fns:getLang('common.delete', null)}</a>
@@ -223,7 +230,7 @@
 			</c:forEach>
 			</tbody>
 		</table>
+		<div class="pagination" id="bottom-sticker">${page}</div>
 	</form:form>
-	<div class="pagination">${page}</div>
 </body>
 </html>

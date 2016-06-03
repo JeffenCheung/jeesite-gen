@@ -1,4 +1,4 @@
-# Pactera JeeSite 企业信息化快速开发平台 V1.2.10
+# Pactera JeeSite 企业信息化快速开发平台 V1.2.11-SNAPSHOT
 
 ## 代码生成器
 通过freemarker，定制模版，用以源代码生成，支持单表、主子表、树形表的生成

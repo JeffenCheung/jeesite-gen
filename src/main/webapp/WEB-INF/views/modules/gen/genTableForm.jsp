@@ -8,6 +8,7 @@
 	 <!-- CSS and JS for table fixed header -->
 	<link rel="stylesheet" href="${ctxStatic}/bootstrap/table-fixed-header-master/table-fixed-header.min.css">
 	<script src="${ctxStatic}/bootstrap/table-fixed-header-master/table-fixed-header.min.js"></script>
+	<script src="${ctxStatic}/bootstrap/table-fixed-header-master/bottom-sticker.min.js"></script>
 	
 <script type="text/javascript">
 	$(document).ready(function() {
@@ -50,6 +51,7 @@
 				$(itm).next().find(".select2-selection__rendered").attr("style", "color: blue");
 			});
 			
+			$("#bottom-sticker").bottomSticker();
 		});
 		
 		/**
@@ -450,7 +452,7 @@
 						</table>
 					</div>
 				</fieldset>
-				<div class="form-actions">
+				<div class="form-actions" id="bottom-sticker">
 					<shiro:hasPermission name="gen:genTable:edit">
 						<input id="btnSubmit" class="btn btn-primary" type="submit"
 							value="保 存" />&nbsp;</shiro:hasPermission>

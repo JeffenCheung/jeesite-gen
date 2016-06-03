@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <template>
+<!--TEST BY JTZHANG-->
 	<name>viewList</name>
 	<filePath>src/main/webapp/WEB-INF/views/${lastPackageName}/${moduleName}/${subModuleName}</filePath>
 	<fileName>${className}List.jsp</fileName>
@@ -11,12 +12,13 @@
 	<title>${functionNameSimple}${r"${fns:getLang('common.management', null)}"}</title>
 	<meta name="decorator" content="default"/>	
 	
-	 <!-- CSS and JS for table fixed header -->
+	 <!-- CSS and JS for table fixed header by jtzhang -->
 	<link rel="stylesheet" href="${r"${ctxStatic}"}/bootstrap/table-fixed-header-master/table-fixed-header.min.css">
 	<script src="${r"${ctxStatic}"}/bootstrap/table-fixed-header-master/table-fixed-header.min.js"></script>
 	<script src="${r"${ctxStatic}"}/common/gridify.min.js"></script>
-	
+	<script src="${r"${ctxStatic}"}/common/gridify.min.js"></script>
 	<script type="text/javascript">
+	var aaa=12;
 		$(document).ready(function() {
 				<#list table.columnList as c>
 					<#if c.isQuery?? && c.isQuery == "1" && c.showType == "autocomplete">
@@ -94,7 +96,7 @@
 				</#if>
 				
 			// 双击记录进行编辑
-			$("#contentTable tbody tr").on("dblclick", function() {
+			$("#contentTable tr").on("dblclick", function() {
 			    location.href="${r"${ctx}"}/${urlPrefix}/form?id="+this.id;
 			});
 			
@@ -171,12 +173,12 @@
 			<#elseif c.showType == "radiobox">
 				<form:radiobuttons path="${c.javaFieldId}" items="${"$"}{fns:getDictList('${c.dictType}')}" itemLabel="label" itemValue="value" htmlEscape="false"/>
 			<#elseif c.showType == "dateselect" && c.queryType == "between">
-				<input id="begin${c.simpleJavaField?cap_first}" name="begin${c.simpleJavaField?cap_first}" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+				<input name="begin${c.simpleJavaField?cap_first}" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${"$"}{${className}.begin${c.simpleJavaField?cap_first}}" pattern="yyyy-MM-dd HH:mm:ss"/>"
-					onfocus="gangDateStart('end${c.simpleJavaField?cap_first}', true, 'yyyy-MM-dd HH:mm:ss');" onclick="gangDateStart('end${c.simpleJavaField?cap_first}', true, 'yyyy-MM-dd HH:mm:ss');"/> - 
-				<input id="end${c.simpleJavaField?cap_first}" name="end${c.simpleJavaField?cap_first}" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/> - 
+				<input name="end${c.simpleJavaField?cap_first}" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${"$"}{${className}.end${c.simpleJavaField?cap_first}}" pattern="yyyy-MM-dd HH:mm:ss"/>"
-					onfocus="gangDateEnd('begin${c.simpleJavaField?cap_first}', true, 'yyyy-MM-dd HH:mm:ss');" onclick="gangDateEnd('begin${c.simpleJavaField?cap_first}', true, 'yyyy-MM-dd HH:mm:ss');"/>
+					onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',isShowClear:false});"/>
 			<#elseif c.showType == "dateselect">
 				<input name="${c.javaFieldId}" type="text" readonly="readonly" maxlength="20" class="input-medium Wdate"
 					value="<fmt:formatDate value="${"$"}{${className}.${c.javaFieldId}}" pattern="yyyy-MM-dd HH:mm:ss"/>"
@@ -201,6 +203,21 @@
 				</#if>
 				<#if showRowCopyFunction??>
 			<shiro:hasPermission name="${permissionPrefix}:dba"><li class="btns" style="padding-left:30px;"><input id="btnCopyChecked" class="btn btn-primary" type="button" value="${r"${fns:getLang('common.copy', null)}"}" disabled="true" /></li></shiro:hasPermission>
+				</#if>
+				<#if showPhysicalDeleteFunction??>
+			<shiro:hasPermission name="${permissionPrefix}:dba"><li class="btns"><input id="btnTruncateTable" class="btn btn-warning" type="button" value="物理清空" onclick="truncateTable('${r"${ctx}"}/${urlPrefix}/truncateTable');"/></li></shiro:hasPermission>
+				</#if>
+				<#if ioArtifact?? && ioArtifact == "orangesignal-csv">
+			<% // CSV管理： 模版下载、数据导入、导入数据校验、数据导出 %>
+			<li><label></label></li>
+			<shiro:hasPermission name="${permissionPrefix}:io"><li class="btns"><input id="btnCsvExport" class="btn btn-primary" type="button" value="CSV数据导出"/></li></shiro:hasPermission>
+			<shiro:hasPermission name="${permissionPrefix}:io"><li class="btns"><input id="btnCsvImport" class="btn btn-primary" type="button" value="CSV数据导入"/></li></shiro:hasPermission>
+				</#if>
+				<#if ioArtifact?? && ioArtifact == "poi">
+			<% // Excel导入导出 %>
+			<li><label></label></li>
+			<shiro:hasPermission name="${permissionPrefix}:io"><li class="btns"><input id="btnExcelExport" class="btn btn-primary" type="button" value="Excel数据导出"/></li></shiro:hasPermission>
+			<shiro:hasPermission name="${permissionPrefix}:io"><li class="btns"><input id="btnExcelImport" class="btn btn-primary" type="button" value="Excel数据导入"/></li></shiro:hasPermission>
 				</#if>
 			<li class="clearfix"></li>
 		</ul>
@@ -227,32 +244,11 @@
 					</#list>
 					<shiro:hasPermission name="${permissionPrefix}:edit"><th>
 						${r"${fns:getLang('common.operate', null)}"}
-						<shiro:hasAnyPermissions name="${permissionPrefix}:dba,${permissionPrefix}:io">
-						<div class="btn-group pull-right">
-							<a href="#" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
-							<ul class="dropdown-menu">
-								<#if showPhysicalDeleteFunction??>
-							<% // 物理删除选项 %>
-							<shiro:hasPermission name="${permissionPrefix}:dba">
-							<form:checkbox id="physicalDelete" path="physicalDelete" label="物理删除" title="默认逻辑删除，勾选后进行物理删除" />
-							<li class="btns"><input id="btnTruncateTable" class="btn btn-warning typeahead" type="button" value="物理清空" onclick="truncateTable('${r"${ctx}"}/${urlPrefix}/truncateTable');"/></li></shiro:hasPermission>
-								</#if>
-								<#if ioArtifact?? && ioArtifact == "orangesignal-csv">
-							<% // CSV管理： 模版下载、数据导入、导入数据校验、数据导出 %>
-							<li class="divider"></li>
-							<shiro:hasPermission name="${permissionPrefix}:io">
-							<li class="btns"><input id="btnCsvExport" class="btn btn-primary typeahead" type="button" value="CSV数据导出"/></li>
-							<li class="btns"><input id="btnCsvImport" class="btn btn-primary typeahead" type="button" value="CSV数据导入"/></li></shiro:hasPermission>
-								</#if>
-								<#if ioArtifact?? && ioArtifact == "poi">
-							<% // Excel导入导出 %>
-							<li class="divider"></li>
-							<shiro:hasPermission name="${permissionPrefix}:io">
-							<li class="btns"><input id="btnExcelExport" class="btn btn-primary typeahead" type="button" value="Excel数据导出"/></li>
-							<li class="btns"><input id="btnExcelImport" class="btn btn-primary typeahead" type="button" value="Excel数据导入"/></li></shiro:hasPermission>
-								</#if>
-							</ul>
-						</div></shiro:hasAnyPermissions>
+							<#if showPhysicalDeleteFunction??>
+						<shiro:hasPermission name="${permissionPrefix}:dba">
+							[<form:checkbox id="physicalDelete" path="physicalDelete" label="物理删除" title="默认逻辑删除，勾选后进行物理删除" />]
+						</shiro:hasPermission>
+							</#if>
 					</th></shiro:hasPermission>
 				</tr>
 			</thead>
@@ -264,7 +260,7 @@
 						</#if>
 						<#if showRowNo??>
 					<td class="row-number">
-						${r"${vs.index + 1}"}
+						${r"${vs.index + 1 + (page.pageNo-1)*page.pageSize}"}
 					</td>
 						</#if>
 					<td class="row-id" style="display:none;">${"${"+className+".id}"}</td>
